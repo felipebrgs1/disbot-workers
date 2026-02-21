@@ -60,21 +60,42 @@ export async function handleDiscordInteraction(c: AppContext) {
             const aiResponse = await generateBotResponse(c.env, config, userPrompt, true);
             console.log(`[Ask] Resposta Gerada (Length): ${aiResponse.length}`);
 
-            // Enviar a resposta editando o webhook diferido original
+            // Formatar conteúdo final
+            let fullContent = `<@${userId}> \n> **${question}**\n\n${aiResponse}`;
+
+            // O Discord tem um limite rígido de 2000 caracteres por mensagem.
+            // Para respostas enormes do /ask, quebramos em múltiplos balões de até 1900 chars.
+            const chunks: string[] = [];
+            while (fullContent.length > 0) {
+              chunks.push(fullContent.substring(0, 1900));
+              fullContent = fullContent.substring(1900);
+            }
+
+            // A primeira parte (chunk[0]) precisa editar a resposta vazia "pensando..." do Discord
             const patchRes = await fetch(
               `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}/messages/@original`,
               {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  content: `<@${userId}> \n> **${question}**\n\n${aiResponse}`,
-                }),
+                body: JSON.stringify({ content: chunks[0] }),
               },
             );
 
             console.log(`[Ask] EditOriginal Status: ${patchRes.status}`);
             if (!patchRes.ok) {
               console.error("[Ask] Response:", await patchRes.text());
+            }
+
+            // As demais partes são postadas como "follow-up messages" usando o mesmo token do webhook
+            for (let i = 1; i < chunks.length; i++) {
+              await fetch(
+                `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ content: chunks[i] }),
+                },
+              );
             }
           } catch (e) {
             console.error("Erro no processamento bg do comando ask", e);
