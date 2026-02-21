@@ -9,7 +9,7 @@ Aqui está o planejamento passo a passo das tarefas necessárias para implementa
 - [x] Criar schema do banco de dados D1 (Tabelas: `bot_state` e `messages`).
 - [x] Gerar migrations através do comando `bun run generate` do Drizzle Kit.
 - [x] Aplicar migrations no Cloudflare D1 local (`bun run db:migrate:local`).
-- [x] Obter credenciais (Discord Bot Token, Discord Client ID, Google Gemini API Key) e adicioná-las ao `.dev.vars` para ambiente local e via wrangler secrets para prod.
+- [x] Obter credenciais (Discord Bot Token, Discord Client ID, Google Gemini API Key) e adicioná-las ao `.env` para ambiente local e via wrangler secrets para prod.
 - [x] Confirmar o mapeamento das variáveis de ambiente na validação do `config.ts`.
 
 ## 2. Ingestão de Histórico do Discord (Polling via Cron)
