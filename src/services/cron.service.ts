@@ -67,24 +67,22 @@ export async function syncDiscordMessages(env: AppBindings) {
 
     let newLastMessageId = lastMessageId;
     const messagesToInsert = [];
-    let wasMentionedThisRun = false;
-    let lastMentionMessage = "";
+    const mentionsToProcess: any[] = [];
 
     // 4. Salvar as mensagens novas
     for (const msg of fetchedMessages) {
       // Ignorar se a mensagem estiver vazia
       if (!msg.content && msg.attachments?.length === 0) continue;
 
-      // Verificar se fomos mencionados
+      // Verificar se fomos mencionados (ignorando mensagens do próprio bot)
       const isMentioned =
-        msg.mentions?.some((mention: any) => mention.id === config.DISCORD_CLIENT_ID) ||
-        msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
-        msg.content.includes(config.DISCORD_CLIENT_ID);
+        msg.author.id !== config.DISCORD_CLIENT_ID &&
+        (msg.mentions?.some((mention: any) => mention.id === config.DISCORD_CLIENT_ID) ||
+          msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
+          msg.content.includes(config.DISCORD_CLIENT_ID));
 
       if (isMentioned) {
-        wasMentionedThisRun = true;
-        // Guardar o texto de quem marcou a gente pra servir de prompt principal pro Gemini
-        lastMentionMessage = `Usuário [${msg.author.username}] diz: ${msg.content}`;
+        mentionsToProcess.push(msg);
       }
 
       messagesToInsert.push({
@@ -119,25 +117,33 @@ export async function syncDiscordMessages(env: AppBindings) {
       console.log(`[Cron] ${messagesToInsert.length} novas mensagens sincronizadas!`);
 
       // 6. Integração Final com o Gemini
-      if (wasMentionedThisRun) {
-        console.log("[Cron] Bot mencionado! Gerando resposta com Inteligência Artificial...");
+      if (mentionsToProcess.length > 0) {
+        console.log(`[Cron] Encontradas ${mentionsToProcess.length} menções! Gerando respostas com Inteligência Artificial...`);
 
-        // Chamando nosso serviço de IA passando o prompt
-        const aiResponse = await generateBotResponse(env, config, lastMentionMessage);
+        // Processa cada menção individualmente
+        for (const mention of mentionsToProcess) {
+          const userPrompt = `Usuário [${mention.author.username}] diz: ${mention.content}`;
 
-        // Envando resposta pro Discord
-        await fetch(`https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            content: aiResponse,
-          }),
-        });
+          // Chamando nosso serviço de IA passando o prompt e histórico
+          const aiResponse = await generateBotResponse(env, config, userPrompt);
 
-        console.log("[Cron] Resposta do Gemini enviada com sucesso!");
+          // Envando resposta pro Discord e respondendo diretamente a mensagem
+          await fetch(`https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              content: `<@${mention.author.id}> ${aiResponse}`,
+              message_reference: {
+                message_id: mention.id
+              }
+            }),
+          });
+
+          console.log(`[Cron] Resposta enviada para ${mention.author.username}!`);
+        }
       }
     }
   } finally {
