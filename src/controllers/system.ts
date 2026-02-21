@@ -1,6 +1,6 @@
 import type { Context } from "hono";
-import { createDb } from "../db/client";
-import type { AppBindings } from "../types/bindings";
+import { createDb } from "@db/client";
+import type { AppBindings } from "@appTypes/bindings";
 
 type AppContext = Context<{ Bindings: AppBindings }>;
 

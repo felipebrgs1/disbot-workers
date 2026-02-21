@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import discordRoutes from "./routes/discord.routes";
-import docsRoutes from "./routes/docs.routes";
-import systemRoutes from "./routes/system.routes";
-import type { AppBindings } from "./types/bindings";
+import discordRoutes from "@routes/discord";
+import docsRoutes from "@routes/docs";
+import systemRoutes from "@routes/system";
+import type { AppBindings } from "@appTypes/bindings";
 
 const app = new Hono<{ Bindings: AppBindings }>();
 

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { handleDiscordInteraction } from "../controllers/discord.controller";
-import type { AppBindings } from "../types/bindings";
+import { handleDiscordInteraction } from "@controllers/discord";
+import type { AppBindings } from "@appTypes/bindings";
 
 const discordRoutes = new Hono<{ Bindings: AppBindings }>().post(
   "/interactions",

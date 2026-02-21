@@ -1,3 +1,3 @@
-export * from "../models/discord-event.model";
-export * from "../models/bot-state.model";
-export * from "../models/message.model";
+export * from "@models/discord-event";
+export * from "@models/bot-state";
+export * from "@models/message";

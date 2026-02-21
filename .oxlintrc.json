@@ -1,9 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "node"
-  ],
+  "plugins": ["typescript", "node"],
   "categories": {},
   "rules": {},
   "settings": {
@@ -39,10 +36,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    ".env",
-    "key.sh"
-  ]
+  "ignorePatterns": ["node_modules", "dist", ".env", "key.sh"]
 }

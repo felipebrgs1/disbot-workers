@@ -6,7 +6,7 @@
   "scripts": {
     "cf-typegen": "bunx wrangler types",
     "generate": "drizzle-kit generate",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit ",
     "docs:generate": "hono-docs generate --config ./hono-docs.ts",
     "deploy": "bunx wrangler deploy",
     "dev": "bunx wrangler dev",

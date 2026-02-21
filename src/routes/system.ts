@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { getHealth, getRoot } from "../controllers/system.controller";
-import type { AppBindings } from "../types/bindings";
+import { getHealth, getRoot } from "@controllers/system";
+import type { AppBindings } from "@appTypes/bindings";
 
 const systemRoutes = new Hono<{ Bindings: AppBindings }>()
   .get("/", getRoot)

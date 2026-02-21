@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import type { createDb } from "../db/client";
+import type { createDb } from "@db/client";
 
 export const discordEvents = sqliteTable("discord_events", {
   id: integer("id").primaryKey({ autoIncrement: true }),

@@ -1,7 +1,7 @@
 import { apiReference } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import openApiDocument from "../../openapi/openapi.json";
-import type { AppBindings } from "../types/bindings";
+import type { AppBindings } from "@appTypes/bindings";
 
 const docsRoutes = new Hono<{ Bindings: AppBindings }>()
   .get(

@@ -1,6 +1,6 @@
 import app from "./app";
-import { syncDiscordMessages } from "./services/cron.service";
-import type { AppBindings } from "./types/bindings";
+import { syncDiscordMessages } from "@services/cron";
+import type { AppBindings } from "@appTypes/bindings";
 
 export default {
   async fetch(request: Request, env: AppBindings, ctx: ExecutionContext) {

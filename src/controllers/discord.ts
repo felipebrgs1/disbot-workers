@@ -1,12 +1,12 @@
 import type { Context } from "hono";
-import { readRuntimeConfig } from "../config";
-import { createDb } from "../db/client";
-import { saveDiscordEvent } from "../models/discord-event.model";
+import { readRuntimeConfig } from "@config";
+import { createDb } from "@db/client";
+import { saveDiscordEvent } from "@models/discord-event";
 import {
   parseDiscordInteraction,
   verifyDiscordRequest,
-} from "../services/discord-interaction.service";
-import type { AppBindings } from "../types/bindings";
+} from "@services/discord-interaction";
+import type { AppBindings } from "@appTypes/bindings";
 
 type AppContext = Context<{ Bindings: AppBindings }>;
 

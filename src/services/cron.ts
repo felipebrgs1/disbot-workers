@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import { readRuntimeConfig } from "../config";
-import { createDb } from "../db/client";
-import { botState, messages } from "../db/schema";
-import type { AppBindings } from "../types/bindings";
-import { generateBotResponse } from "./gemini.service";
+import { readRuntimeConfig } from "@config";
+import { createDb } from "@db/client";
+import { botState, messages } from "@db/schema";
+import type { AppBindings } from "@appTypes/bindings";
+import { generateBotResponse } from "./gemini";
 
 export async function syncDiscordMessages(env: AppBindings) {
   // --- Mecanismo de Lock com KV ---
@@ -81,8 +81,15 @@ export async function syncDiscordMessages(env: AppBindings) {
           msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
           msg.content.includes(config.DISCORD_CLIENT_ID));
 
-      if (isMentioned) {
-        mentionsToProcess.push(msg);
+      const isAskCommand =
+        msg.author.id !== config.DISCORD_CLIENT_ID &&
+        (msg.content.trim().startsWith("/ask") || msg.content.trim().startsWith("!ask"));
+
+      if (isMentioned || isAskCommand) {
+        mentionsToProcess.push({
+          ...msg,
+          isAskCommand,
+        });
       }
 
       messagesToInsert.push({
@@ -118,29 +125,39 @@ export async function syncDiscordMessages(env: AppBindings) {
 
       // 6. Integração Final com o Gemini
       if (mentionsToProcess.length > 0) {
-        console.log(`[Cron] Encontradas ${mentionsToProcess.length} menções! Gerando respostas com Inteligência Artificial...`);
+        console.log(
+          `[Cron] Encontradas ${mentionsToProcess.length} menções! Gerando respostas com Inteligência Artificial...`,
+        );
 
         // Processa cada menção individualmente
         for (const mention of mentionsToProcess) {
           const userPrompt = `Usuário [${mention.author.username}] diz: ${mention.content}`;
 
           // Chamando nosso serviço de IA passando o prompt e histórico
-          const aiResponse = await generateBotResponse(env, config, userPrompt);
+          const aiResponse = await generateBotResponse(
+            env,
+            config,
+            userPrompt,
+            mention.isAskCommand,
+          );
 
           // Envando resposta pro Discord e respondendo diretamente a mensagem
-          await fetch(`https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
-              "Content-Type": "application/json",
+          await fetch(
+            `https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                content: `<@${mention.author.id}> ${aiResponse}`,
+                message_reference: {
+                  message_id: mention.id,
+                },
+              }),
             },
-            body: JSON.stringify({
-              content: `<@${mention.author.id}> ${aiResponse}`,
-              message_reference: {
-                message_id: mention.id
-              }
-            }),
-          });
+          );
 
           console.log(`[Cron] Resposta enviada para ${mention.author.username}!`);
         }
