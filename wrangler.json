@@ -6,7 +6,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "compatibility_date": "2025-10-08",
   "main": "src/index.ts",
-  "name": "muddy-sunset-04c3",
+  "name": "elmatadore",
   "upload_source_maps": true,
   "d1_databases": [
     {
@@ -18,9 +18,13 @@
   "observability": {
     "enabled": true
   },
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "triggers": {
-    "crons": ["*/5 * * * *"]
+    "crons": [
+      "*/5 * * * *"
+    ]
   },
   "kv_namespaces": [
     {
