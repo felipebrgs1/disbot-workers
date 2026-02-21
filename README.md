@@ -8,11 +8,14 @@ Starter limpo para evoluir o projeto com:
 - Zod (validações)
 - Discord bot por Interactions
 - Bun como package manager/runtime de desenvolvimento
+- Estrutura MVC
+- Documentacao OpenAPI automatica com `hono-docs`
 
 ## Primeiros passos
 
 ```bash
 bun install
+bun run docs:generate
 bun run dev
 ```
 
@@ -31,3 +34,8 @@ bun run deploy
 ## Documento de arquitetura
 
 Veja `PROJECT.md` para escopo, estrutura sugerida e próximos passos do projeto.
+
+## Docs da API
+
+- UI: `GET /docs`
+- JSON OpenAPI: `GET /docs/openapi`

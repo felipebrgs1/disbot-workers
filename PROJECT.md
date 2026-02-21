@@ -15,13 +15,29 @@ Construir um backend em Cloudflare Workers com:
 
 ```txt
 src/
+  index.ts           # Entrada do Worker
+  app.ts             # Composicao de rotas
   config.ts          # Leitura/validacao de env vars com Zod
-  index.ts           # App Hono + rotas base + endpoint Discord
+  types/
+    bindings.ts      # Tipos de bindings do Worker
+  routes/
+    system.routes.ts
+    discord.routes.ts
+    docs.routes.ts
+  controllers/
+    system.controller.ts
+    discord.controller.ts
+  services/
+    discord-interaction.service.ts
+  models/
+    discord-event.model.ts
   db/
     client.ts        # Instancia Drizzle para D1
-    schema.ts        # Tabelas Drizzle (sqlite-core)
 migrations/
   0001_create_discord_events_table.sql  # Primeira tabela (discord_events)
+openapi/
+  openapi.json       # Arquivo gerado pelo hono-docs
+hono-docs.ts         # Configuracao de geracao da OpenAPI
 ```
 
 ## Rotas Ja Criadas
@@ -29,6 +45,8 @@ migrations/
 - `GET /` status basico do servico
 - `GET /health` healthcheck
 - `POST /discord/interactions` validacao de assinatura + resposta inicial
+- `GET /docs` UI da documentacao
+- `GET /docs/openapi` JSON OpenAPI
 
 ## Variaveis Necessarias
 
@@ -44,6 +62,7 @@ bunx wrangler secret put DISCORD_PUBLIC_KEY
 
 ```bash
 bun install
+bun run docs:generate
 bun run cf-typegen
 bun run db:migrate:local
 bun run dev
@@ -53,7 +72,7 @@ bun run dev
 
 1. Criar comandos slash no Discord (`/ping`, `/help`, etc.).
 2. Persistir eventos/comandos em `discord_events` usando Drizzle.
-3. Separar handlers por modulo (`src/discord/*`).
+3. Adicionar camada de repositorios para queries mais complexas.
 4. Adicionar testes de rota e validacao (Vitest).
 5. Configurar deploy em ambiente `staging` e `production`.
 

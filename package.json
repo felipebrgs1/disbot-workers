@@ -2,6 +2,7 @@
 	"name": "muddy-sunset-04c3",
 	"description": "Cloudflare Worker with Hono, Drizzle, Zod and Discord interactions.",
 	"devDependencies": {
+		"@rcmade/hono-docs": "latest",
 		"@types/node": "^25.3.0",
 		"typescript": "5.9.3",
 		"wrangler": "^4.67.0"
@@ -18,6 +19,7 @@
 	"scripts": {
 		"cf-typegen": "bunx wrangler types",
 		"check": "tsc --noEmit",
+		"docs:generate": "hono-docs generate --config ./hono-docs.ts",
 		"deploy": "bunx wrangler deploy",
 		"dev": "bunx wrangler dev",
 		"db:migrate:local": "bunx wrangler d1 migrations apply DB --local",
