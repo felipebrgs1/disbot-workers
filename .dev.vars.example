@@ -1,0 +1,5 @@
+DISCORD_PUBLIC_KEY="seu_discord_public_key"
+DISCORD_BOT_TOKEN="seu_discord_bot_token"
+DISCORD_CHANNEL_ID="seu_discord_channel_id"
+GEMINI_API_KEY="sua_gemini_api_key_aqui"
+DISCORD_CLIENT_ID="seu_discord_client_id"

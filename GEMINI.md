@@ -4,7 +4,7 @@
 
 Este projeto é um Bot para Discord que utiliza **Cloudflare Workers** (Serverless/Edge), **Cloudflare D1** (Banco de dados SQLite na nuvem) e a API do **Google Gemini** para responder a menções e mensagens com o contexto do grupo.
 
-STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Always retrieve current documentation before any Workers, KV, R2, D1, Durable Objects, Queues, Vectorize, AI, or Agents SDK task.
+STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Always retrieve current documentation before any Workers, KV, D1, Durable Objects, Queues, Vectorize, AI, or Agents SDK task.
 
 ## Arquitetura Atual
 
