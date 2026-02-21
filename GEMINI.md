@@ -8,11 +8,15 @@ STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Alwa
 
 ## Arquitetura Atual
 
-- **Ambiente:** Cloudflare Workers (Stack Edge, suporta partes do Node.js Runtime via `nodejs_compat`)
-- **Banco de Dados (DB):** Cloudflare D1 (SQLite) hospedado na nuvem e acessado via Drizzle ORM.
-- **Armazenamento de Estado (KV):** Cloudflare KV (`discbot`) utilizado para controle de concorrência e evitar processamento duplicado.
-- **Bot Strategy:** Funciona por Eventos / Cron (não utiliza Gateway WebSocket devido a limitações do serverless).
-- **IA:** Google Gemini API 2.5 Flash via SDK `@google/genai`.
+- **Ambiente:** Cloudflare Workers (Stack Edge, suporta partes do Node.js Runtime via `nodejs_compat`) usando o framework HTTP **Hono**.
+- **Path Aliases:** O projeto usa importações limpas (e.g., `@controllers/`, `@services/`, `@db/`, `@config`, `@models/`, `@appTypes/`). Extensões verbosas (*.service.ts) não são mais utilizadas, nomes de arquivos agora são diretos (`cron.ts`, `gemini.ts`).
+- **Banco de Dados Mestre:** Cloudflare D1 (SQLite) via Drizzle ORM (`src/db/schema.ts`).
+- **Memória de Longo Prazo Semântica (RAG):** Cloudflare **Vectorize** (`discbot-memory`), onde as conversas do DB são transformadas em Embeddings Geométricos (`text-embedding-004`). Nas perguntas em formato Slash Command, o Gemini consulta as 10 memórias matemáticas mais relevantes do canal.
+- **Armazenamento Transiente/Sync:** Cloudflare KV (`discbot`) utilizado para _Locks_ de Concorrência do Cron e estado básico.
+- **Gatilhos / Ingestão:**
+  - **Cron Job (1 Minuto):** Recupera o histórico de canais retroativos via HTTP REST do Discord. Salva mensagens não processadas no SQLite, traduz para *Embeddings* no Vectorize (via `env.VECTORIZE.upsert`), e responde caso descubra menções diretas.
+  - **Slash Commands (`/ask`):** O bot recebe chamadas instantâneas Webhook na rota `/discord/interactions`. Utiliza `ctx.waitUntil` para fazer o processamento da Rota de IA no background assíncrono, enviando imediatamente o sinal de "pensando" do Discord (`Type 5: Defer`) que será atualizado no final usando PATCH.
+- **IA:** *Google Gemini API 2.5 Flash* (ou *3.0 Preview*) via SDK `@google/genai`. Duas variações de personalidade (Casual e Aprofundada) com forte apelação à contexto através do Vectorize. A IA também detecta ativamente o *Top 5 de Membros* mais frequentes do Canal atual em que está se engajando.
 
 ## Regras de Atuação do Agente (IA)
 
