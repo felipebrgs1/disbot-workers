@@ -27,6 +27,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260228.0",
     "@rcmade/hono-docs": "latest",
     "@types/node": "^25.3.0",
     "drizzle-kit": "^0.31.9",

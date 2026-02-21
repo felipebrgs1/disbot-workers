@@ -10,6 +10,7 @@ STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Alwa
 
 - **Ambiente:** Cloudflare Workers (Stack Edge, suporta partes do Node.js Runtime via `nodejs_compat`)
 - **Banco de Dados (DB):** Cloudflare D1 (SQLite) hospedado na nuvem e acessado via Drizzle ORM.
+- **Armazenamento de Estado (KV):** Cloudflare KV (`discbot`) utilizado para controle de concorrência e evitar processamento duplicado.
 - **Bot Strategy:** Funciona por Eventos / Cron (não utiliza Gateway WebSocket devido a limitações do serverless).
 - **IA:** Google Gemini API 2.5 Flash via SDK `@google/genai`.
 
@@ -17,6 +18,7 @@ STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Alwa
 
 - **Apenas Geração de Código:** A função da IA neste projeto é estritamente fornecer, gerar e refatorar código estrutural.
 - **NÃO Executar Comandos de Infra/Deploy:** A IA **NÃO DEVE** rodar comandos como `bun run db:migrate:local`, `bun run deploy`, pushes para o github ou qualquer outra tarefa que altere o estado do banco de dados ou da cloud. Estas tarefas serão executadas manualmente pelo desenvolvedor. A IA apenas instrui os comandos quando aplicável.
+- **Tipagens e Interfaces:** Por padrão, é **proibido** definir `types` ou `interfaces` diretamente nos arquivos fonte dos arquivos, rotas e serviços. Todas as tipagens devem ficar na pasta `src/types/` e o uso de validação através do **Zod** é mandatório para dados complexos ou vindo de rotas/serviços externos.
 
 ## Drizzle e Migrations (IMPORTANTE)
 

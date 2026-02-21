@@ -1,3 +1,5 @@
+import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+
 export type AppBindings = {
   DB: D1Database;
   DISCORD_PUBLIC_KEY: string;
@@ -5,4 +7,5 @@ export type AppBindings = {
   DISCORD_CHANNEL_ID: string;
   GEMINI_API_KEY: string;
   DISCORD_CLIENT_ID: string;
+  discbot: KVNamespace;
 };
