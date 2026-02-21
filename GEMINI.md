@@ -1,3 +1,5 @@
+**Package manager: bun**
+
 # Cloudflare Workers - Discord Bot com IA (Gemini)
 
 Este projeto é um Bot para Discord que utiliza **Cloudflare Workers** (Serverless/Edge), **Cloudflare D1** (Banco de dados SQLite na nuvem) e a API do **Google Gemini** para responder a menções e mensagens com o contexto do grupo.
