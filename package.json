@@ -8,6 +8,7 @@
 		"wrangler": "^4.67.0"
 	},
 	"dependencies": {
+		"@scalar/hono-api-reference": "latest",
 		"discord-interactions": "latest",
 		"drizzle-orm": "latest",
 		"hono": "latest",

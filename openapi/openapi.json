@@ -867,11 +867,58 @@
                                                             "required"
                                                           ]
                                                         },
-                                                        "paths": {}
+                                                        "servers": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            },
+                                                            "items": {}
+                                                          },
+                                                          "required": [
+                                                            "type",
+                                                            "items"
+                                                          ]
+                                                        },
+                                                        "tags": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            },
+                                                            "items": {}
+                                                          },
+                                                          "required": [
+                                                            "type",
+                                                            "items"
+                                                          ]
+                                                        },
+                                                        "paths": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            },
+                                                            "properties": {},
+                                                            "required": {
+                                                              "type": "array",
+                                                              "items": {
+                                                                "type": "string"
+                                                              }
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type",
+                                                            "properties",
+                                                            "required"
+                                                          ]
+                                                        }
                                                       },
                                                       "required": [
                                                         "openapi",
                                                         "info",
+                                                        "servers",
+                                                        "tags",
                                                         "paths"
                                                       ]
                                                     },
