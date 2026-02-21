@@ -10,7 +10,7 @@ export default defineConfig({
 		},
 		servers: [
 			{
-				url: "http://localhost:8787",
+				url: "/",
 			},
 		],
 	},

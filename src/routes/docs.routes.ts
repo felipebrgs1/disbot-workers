@@ -7,13 +7,13 @@ const docsRoutes = new Hono<{ Bindings: AppBindings }>()
 	.get(
 		"/",
 		apiReference({
-			spec: {
-				url: "/docs/openapi",
-			},
+			url: "/docs/openapi",
 		}),
 	)
 	.get("/openapi", (c) => {
-		return c.json(openApiDocument);
+		return c.json(openApiDocument, 200, {
+			"cache-control": "no-store",
+		});
 	});
 
 export type AppType = typeof docsRoutes;
