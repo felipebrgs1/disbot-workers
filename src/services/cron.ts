@@ -3,7 +3,7 @@ import { readRuntimeConfig } from "@config";
 import { createDb } from "@db/client";
 import { botState, messages } from "@db/schema";
 import type { AppBindings } from "@appTypes/bindings";
-import { generateBotResponse } from "./gemini";
+import { embedAndStoreMessages, generateBotResponse } from "./gemini";
 
 export async function syncDiscordMessages(env: AppBindings) {
   // --- Mecanismo de Lock com KV ---
@@ -108,6 +108,9 @@ export async function syncDiscordMessages(env: AppBindings) {
     if (messagesToInsert.length > 0) {
       // Inserir mensagens em batch
       await db.insert(messages).values(messagesToInsert).onConflictDoNothing();
+
+      // Incorporar novo histórico longo prazo via RAG
+      await embedAndStoreMessages(env, config, messagesToInsert);
 
       // 5. Atualizar estado do bot
       if (newLastMessageId) {

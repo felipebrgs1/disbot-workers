@@ -1,4 +1,4 @@
-import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+import type { D1Database, KVNamespace, VectorizeIndex } from "@cloudflare/workers-types";
 
 export type AppBindings = {
   DB: D1Database;
@@ -8,4 +8,5 @@ export type AppBindings = {
   GEMINI_API_KEY: string;
   DISCORD_CLIENT_ID: string;
   discbot: KVNamespace;
+  VECTORIZE: VectorizeIndex;
 };
