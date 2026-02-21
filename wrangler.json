@@ -4,7 +4,7 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "compatibility_date": "2025-10-08",
+  "compatibility_date": "2026-02-21",
   "main": "src/index.ts",
   "name": "elmatadore",
   "upload_source_maps": true,
