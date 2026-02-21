@@ -18,6 +18,12 @@ export async function syncDiscordMessages(env: AppBindings) {
 
   try {
     const config = readRuntimeConfig(env as any);
+
+    if (!config.DISCORD_CHANNEL_ID) {
+      console.log("[Cron] Variável DISCORD_CHANNEL_ID não configurada. Cron desabilitado.");
+      return;
+    }
+
     const db = createDb(env.DB);
 
     // 1. Obter o último ID lido da tabela bot_state

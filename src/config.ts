@@ -3,7 +3,7 @@ import { z } from "zod";
 const runtimeConfigSchema = z.object({
   DISCORD_PUBLIC_KEY: z.string().min(1, "DISCORD_PUBLIC_KEY is required"),
   DISCORD_BOT_TOKEN: z.string().min(1, "DISCORD_BOT_TOKEN is required"),
-  DISCORD_CHANNEL_ID: z.string().min(1, "DISCORD_CHANNEL_ID is required"),
+  DISCORD_CHANNEL_ID: z.string().optional(),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
   DISCORD_CLIENT_ID: z.string().min(1, "DISCORD_CLIENT_ID is required"),
 });
@@ -13,7 +13,7 @@ export type RuntimeConfig = z.infer<typeof runtimeConfigSchema>;
 type RuntimeEnv = {
   DISCORD_PUBLIC_KEY: string;
   DISCORD_BOT_TOKEN: string;
-  DISCORD_CHANNEL_ID: string;
+  DISCORD_CHANNEL_ID?: string;
   GEMINI_API_KEY: string;
   DISCORD_CLIENT_ID: string;
 };

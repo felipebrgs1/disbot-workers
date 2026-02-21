@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { RuntimeConfig } from "@config";
 import { createDb } from "@db/client";
 import { messages } from "@db/schema";
@@ -10,11 +10,20 @@ export async function generateBotResponse(
   config: RuntimeConfig,
   userPrompt: string,
   isAskCommand: boolean = false,
+  channelId?: string,
 ): Promise<string> {
   const db = createDb(env.DB);
 
   // 1. Resgatar as últimas 50 mensagens do banco para contexto
-  const historyRows = await db.select().from(messages).orderBy(desc(messages.timestamp)).limit(50);
+  let historyQuery = db.select().from(messages).$dynamic();
+
+  if (channelId) {
+    historyQuery = historyQuery.where(eq(messages.channelId, channelId));
+  } else if (config.DISCORD_CHANNEL_ID) {
+    historyQuery = historyQuery.where(eq(messages.channelId, config.DISCORD_CHANNEL_ID));
+  }
+
+  const historyRows = await historyQuery.orderBy(desc(messages.timestamp)).limit(50);
 
   // Reverter a ordem para ficar cronológica (mais antiga -> mais nova)
   historyRows.reverse();

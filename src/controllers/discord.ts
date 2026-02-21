@@ -57,45 +57,37 @@ export async function handleDiscordInteraction(c: AppContext) {
         (async () => {
           try {
             console.log(`[Ask] Processando em background a pergunta: ${question}`);
-            const aiResponse = await generateBotResponse(c.env, config, userPrompt, true);
+            const channelId = interact.channel?.id || interact.channel_id;
+            const aiResponse = await generateBotResponse(
+              c.env,
+              config,
+              userPrompt,
+              true,
+              channelId,
+            );
             console.log(`[Ask] Resposta Gerada (Length): ${aiResponse.length}`);
 
             // Formatar conteúdo final
-            let fullContent = `<@${userId}> \n> **${question}**\n\n${aiResponse}`;
+            const fullContent = `<@${userId}> \n> **${question}**\n\n${aiResponse}`;
 
             // O Discord tem um limite rígido de 2000 caracteres por mensagem.
-            // Para respostas enormes do /ask, quebramos em múltiplos balões de até 1900 chars.
-            const chunks: string[] = [];
-            while (fullContent.length > 0) {
-              chunks.push(fullContent.substring(0, 1900));
-              fullContent = fullContent.substring(1900);
-            }
+            // Para respostas enormes, limitamos para enviar apenas uma mensagem (até 1950 chars para ter margem)
+            const safeContent =
+              fullContent.length > 1950 ? fullContent.substring(0, 1950) + "..." : fullContent;
 
-            // A primeira parte (chunk[0]) precisa editar a resposta vazia "pensando..." do Discord
+            // Enviar a resposta editando o webhook diferido original
             const patchRes = await fetch(
               `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}/messages/@original`,
               {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: chunks[0] }),
+                body: JSON.stringify({ content: safeContent }),
               },
             );
 
             console.log(`[Ask] EditOriginal Status: ${patchRes.status}`);
             if (!patchRes.ok) {
               console.error("[Ask] Response:", await patchRes.text());
-            }
-
-            // As demais partes são postadas como "follow-up messages" usando o mesmo token do webhook
-            for (let i = 1; i < chunks.length; i++) {
-              await fetch(
-                `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}`,
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ content: chunks[i] }),
-                },
-              );
             }
           } catch (e) {
             console.error("Erro no processamento bg do comando ask", e);
