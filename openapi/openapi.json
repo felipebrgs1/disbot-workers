@@ -1,9 +1,963 @@
 {
-	"openapi": "3.0.0",
-	"info": {
-		"title": "Muddy Sunset API",
-		"version": "0.1.0",
-		"description": "OpenAPI gerado automaticamente com hono-docs."
-	},
-	"paths": {}
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Muddy Sunset API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8787"
+    }
+  ],
+  "tags": [
+    {
+      "name": "System"
+    },
+    {
+      "name": "Discord"
+    },
+    {
+      "name": "Documentation"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "API status",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "runtime": {
+                      "type": "string"
+                    },
+                    "architecture": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "status",
+                    "runtime",
+                    "architecture"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Retorna status basico da API em Cloudflare Workers.",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {},
+                    "timestamp": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "timestamp"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Endpoint de health check da aplicacao.",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/discord/interactions": {
+      "post": {
+        "summary": "Discord interactions",
+        "responses": {
+          "400": {
+            "description": "Status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "enum": [
+                        "invalid_json_body",
+                        "invalid_discord_interaction"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Status 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Recebe interacoes assinadas do Discord.",
+        "tags": [
+          "Discord"
+        ]
+      }
+    },
+    "/docs": {
+      "get": {
+        "summary": "API docs UI",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "Interface visual da documentacao OpenAPI.",
+        "tags": [
+          "Documentation"
+        ]
+      }
+    },
+    "/docs/openapi": {
+      "get": {
+        "summary": "OpenAPI JSON",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openapi": {
+                      "type": "string"
+                    },
+                    "info": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "version"
+                      ]
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ]
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
+                      }
+                    },
+                    "paths": {
+                      "type": "object",
+                      "properties": {
+                        "/": {
+                          "type": "object",
+                          "properties": {
+                            "get": {
+                              "type": "object",
+                              "properties": {
+                                "summary": {
+                                  "type": "string"
+                                },
+                                "responses": {
+                                  "type": "object",
+                                  "properties": {
+                                    "default": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "name": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        },
+                                                        "status": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        },
+                                                        "runtime": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        },
+                                                        "architecture": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "name",
+                                                        "status",
+                                                        "runtime",
+                                                        "architecture"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "default"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "summary",
+                                "responses",
+                                "description",
+                                "tags"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "get"
+                          ]
+                        },
+                        "/health": {
+                          "type": "object",
+                          "properties": {
+                            "get": {
+                              "type": "object",
+                              "properties": {
+                                "summary": {
+                                  "type": "string"
+                                },
+                                "responses": {
+                                  "type": "object",
+                                  "properties": {
+                                    "default": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "ok": {},
+                                                        "timestamp": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "ok",
+                                                        "timestamp"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "default"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "summary",
+                                "responses",
+                                "description",
+                                "tags"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "get"
+                          ]
+                        },
+                        "/discord/interactions": {
+                          "type": "object",
+                          "properties": {
+                            "post": {
+                              "type": "object",
+                              "properties": {
+                                "summary": {
+                                  "type": "string"
+                                },
+                                "responses": {
+                                  "type": "object",
+                                  "properties": {
+                                    "400": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "error": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            },
+                                                            "enum": {
+                                                              "type": "array",
+                                                              "items": {
+                                                                "type": "string"
+                                                              }
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type",
+                                                            "enum"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "error"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    },
+                                    "401": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "error": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "error"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    },
+                                    "default": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "400",
+                                    "401",
+                                    "default"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "summary",
+                                "responses",
+                                "description",
+                                "tags"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "post"
+                          ]
+                        },
+                        "/docs": {
+                          "type": "object",
+                          "properties": {
+                            "get": {
+                              "type": "object",
+                              "properties": {
+                                "summary": {
+                                  "type": "string"
+                                },
+                                "responses": {
+                                  "type": "object",
+                                  "properties": {
+                                    "default": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {}
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "default"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "summary",
+                                "responses",
+                                "description",
+                                "tags"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "get"
+                          ]
+                        },
+                        "/docs/openapi": {
+                          "type": "object",
+                          "properties": {
+                            "get": {
+                              "type": "object",
+                              "properties": {
+                                "summary": {
+                                  "type": "string"
+                                },
+                                "responses": {
+                                  "type": "object",
+                                  "properties": {
+                                    "default": {
+                                      "type": "object",
+                                      "properties": {
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "content": {
+                                          "type": "object",
+                                          "properties": {
+                                            "application/json": {
+                                              "type": "object",
+                                              "properties": {
+                                                "schema": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string"
+                                                    },
+                                                    "properties": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "openapi": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type"
+                                                          ]
+                                                        },
+                                                        "info": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string"
+                                                            },
+                                                            "properties": {},
+                                                            "required": {
+                                                              "type": "array",
+                                                              "items": {
+                                                                "type": "string"
+                                                              }
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "type",
+                                                            "properties",
+                                                            "required"
+                                                          ]
+                                                        },
+                                                        "paths": {}
+                                                      },
+                                                      "required": [
+                                                        "openapi",
+                                                        "info",
+                                                        "paths"
+                                                      ]
+                                                    },
+                                                    "required": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "type",
+                                                    "properties",
+                                                    "required"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "schema"
+                                              ]
+                                            }
+                                          },
+                                          "required": [
+                                            "application/json"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "description",
+                                        "content"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "default"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "summary",
+                                "responses",
+                                "description",
+                                "tags"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "get"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "/",
+                        "/health",
+                        "/discord/interactions",
+                        "/docs",
+                        "/docs/openapi"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "openapi",
+                    "info",
+                    "servers",
+                    "tags",
+                    "paths"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Documento OpenAPI gerado automaticamente.",
+        "tags": [
+          "Documentation"
+        ]
+      }
+    }
+  }
 }

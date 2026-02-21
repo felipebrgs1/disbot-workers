@@ -1,7 +1,22 @@
 import { defineConfig } from "@rcmade/hono-docs";
 
 export default defineConfig({
-	output: "./openapi/openapi.json",
+	tsConfigPath: "./tsconfig.json",
+	openApi: {
+		openapi: "3.0.0",
+		info: {
+			title: "Muddy Sunset API",
+			version: "0.1.0",
+		},
+		servers: [
+			{
+				url: "http://localhost:8787",
+			},
+		],
+	},
+	outputs: {
+		openApiJson: "./openapi/openapi.json",
+	},
 	apis: [
 		{
 			name: "System",
