@@ -71,12 +71,12 @@ Use esse contexto se fizer sentido. Agora responda a última mensagem (onde menc
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.0-flash",
+      model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: promptText }] }],
       config: isAskCommand
         ? {
-            // Remove restrições de pensamento/extensão do bot se for Ask
-          }
+          // Remove restrições de pensamento/extensão do bot se for Ask
+        }
         : {},
     });
 
