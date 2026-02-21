@@ -22,6 +22,7 @@ export async function embedAndStoreMessages(
       const response = await ai.models.embedContent({
         model: "models/gemini-embedding-001",
         contents,
+        config: { outputDimensionality: 768 },
       });
 
       const embeddings = response.embeddings;
@@ -41,6 +42,7 @@ export async function embedAndStoreMessages(
         }).filter(v => v !== null) as any[];
 
         if (vectorsToInsert.length > 0) {
+          console.log(`[Vectorize] Salvando ${vectorsToInsert.length} memórias no namespace ${batchMessages[0].channelId}. Dim: ${vectorsToInsert[0].values.length}`);
           await env.VECTORIZE.upsert(vectorsToInsert);
           console.log(`[Vectorize] Salvas ${vectorsToInsert.length} memórias! (Chunk ${i / MAX_BATCH_GEMINI + 1})`);
         }
@@ -69,30 +71,27 @@ export async function generateBotResponse(
     const embeddingRes = await ai.models.embedContent({
       model: "models/gemini-embedding-001",
       contents: userPrompt,
+      config: { outputDimensionality: 768 },
     });
 
     const searchVector = embeddingRes.embeddings?.[0]?.values;
 
+    const targetNamespace = channelId || config.DISCORD_CHANNEL_ID;
+
     // 3. Buscar as 10 memórias matemáticas mais relevantes no Vectorize (filtradas pelo namespace do Canal atual)
-    if (searchVector && channelId) {
+    if (searchVector && targetNamespace) {
+      console.log(`[Vectorize] Buscando memórias no namespace: ${targetNamespace}. Query dim: ${searchVector.length}`);
       const queryResult = await env.VECTORIZE.query(searchVector, {
         topK: 10,
-        namespace: channelId,
+        namespace: targetNamespace,
         returnMetadata: "all",
       });
 
       if (queryResult.matches && queryResult.matches.length > 0) {
         vectorMatches = queryResult.matches;
-      }
-    } else if (searchVector && config.DISCORD_CHANNEL_ID) {
-      const queryResult = await env.VECTORIZE.query(searchVector, {
-        topK: 10,
-        namespace: config.DISCORD_CHANNEL_ID,
-        returnMetadata: "all",
-      });
-
-      if (queryResult.matches && queryResult.matches.length > 0) {
-        vectorMatches = queryResult.matches;
+        console.log(`[Vectorize] Encontradas ${vectorMatches.length} memórias relevantes!`);
+      } else {
+        console.log(`[Vectorize] Nenhuma memória encontrada no namespace ${targetNamespace}.`);
       }
     }
 
