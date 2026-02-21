@@ -81,14 +81,10 @@ export async function syncDiscordMessages(env: AppBindings) {
           msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
           msg.content.includes(config.DISCORD_CLIENT_ID));
 
-      const isAskCommand =
-        msg.author.id !== config.DISCORD_CLIENT_ID &&
-        (msg.content.trim().startsWith("/ask") || msg.content.trim().startsWith("!ask"));
-
-      if (isMentioned || isAskCommand) {
+      if (isMentioned) {
         mentionsToProcess.push({
           ...msg,
-          isAskCommand,
+          isAskCommand: false,
         });
       }
 

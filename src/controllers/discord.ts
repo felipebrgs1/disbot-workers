@@ -1,7 +1,5 @@
 import type { Context } from "hono";
 import { readRuntimeConfig } from "@config";
-import { createDb } from "@db/client";
-import { saveDiscordEvent } from "@models/discord-event";
 import {
   parseDiscordInteraction,
   verifyDiscordRequest,
@@ -41,21 +39,50 @@ export async function handleDiscordInteraction(c: AppContext) {
 
   if (interaction.type === 2) {
     const commandName = interaction.data?.name ?? "unknown";
-    const db = createDb(c.env.DB);
 
-    try {
-      await saveDiscordEvent(db, {
-        interactionId: interaction.id,
-        commandName,
-      });
-    } catch (error) {
-      console.warn("Could not persist discord event", error);
+    if (commandName === "ask") {
+      const options = interaction.data?.options || [];
+      // @ts-ignore
+      const questionOption = options.find((opt: any) => opt.name === "pergunta");
+      const question = questionOption ? questionOption.value : "";
+
+      const interact = interaction as any;
+      const userId = interact.member?.user?.id || interact.user?.id || "";
+      const username = interact.member?.user?.username || interact.user?.username || "Alguém";
+
+      const userPrompt = `Usuário [${username}] perguntou no comando /ask: ${question}`;
+
+      const config = readRuntimeConfig(c.env);
+
+      // Iniciar a geração no background (Cloudflare Worker permite exceder 3 segundos aqui)
+      c.executionCtx.waitUntil(
+        (async () => {
+          try {
+            const { generateBotResponse } = await import("../services/gemini");
+            const aiResponse = await generateBotResponse(c.env, config, userPrompt, true);
+
+            // Enviar a resposta editando o webhook diferido original
+            await fetch(`https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interaction.token}/messages/@original`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                content: `<@${userId}> \n> **${question}**\n\n${aiResponse}`
+              })
+            });
+          } catch (e) {
+            console.error("Erro no processamento bg do comando ask", e);
+          }
+        })()
+      );
+
+      // Responder 5 (AACK / Defer) imediatamente ao Discord
+      return c.json({ type: 5 });
     }
 
     return c.json({
       type: 4,
       data: {
-        content: `Comando "${commandName}" recebido. Handler em implementacao.`,
+        content: `Comando "${commandName}" não mapeado.`,
       },
     });
   }
