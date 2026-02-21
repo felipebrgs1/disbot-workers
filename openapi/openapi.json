@@ -45,21 +45,14 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name",
-                    "status",
-                    "runtime",
-                    "architecture"
-                  ]
+                  "required": ["name", "status", "runtime", "architecture"]
                 }
               }
             }
           }
         },
         "description": "Retorna status basico da API em Cloudflare Workers.",
-        "tags": [
-          "System"
-        ]
+        "tags": ["System"]
       }
     },
     "/health": {
@@ -78,19 +71,14 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "ok",
-                    "timestamp"
-                  ]
+                  "required": ["ok", "timestamp"]
                 }
               }
             }
           }
         },
         "description": "Endpoint de health check da aplicacao.",
-        "tags": [
-          "System"
-        ]
+        "tags": ["System"]
       }
     },
     "/discord/interactions": {
@@ -106,15 +94,10 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "enum": [
-                        "invalid_json_body",
-                        "invalid_discord_interaction"
-                      ]
+                      "enum": ["invalid_json_body", "invalid_discord_interaction"]
                     }
                   },
-                  "required": [
-                    "error"
-                  ]
+                  "required": ["error"]
                 }
               }
             }
@@ -130,9 +113,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "error"
-                  ]
+                  "required": ["error"]
                 }
               }
             }
@@ -148,18 +129,14 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             }
           }
         },
         "description": "Recebe interacoes assinadas do Discord.",
-        "tags": [
-          "Discord"
-        ]
+        "tags": ["Discord"]
       }
     },
     "/docs": {
@@ -176,9 +153,7 @@
           }
         },
         "description": "Interface visual da documentacao OpenAPI.",
-        "tags": [
-          "Documentation"
-        ]
+        "tags": ["Documentation"]
       }
     },
     "/docs/openapi": {
@@ -205,10 +180,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "title",
-                        "version"
-                      ]
+                      "required": ["title", "version"]
                     },
                     "servers": {
                       "type": "array",
@@ -219,9 +191,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "url"
-                        ]
+                        "required": ["url"]
                       }
                     },
                     "tags": {
@@ -233,9 +203,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "name"
-                        ]
+                        "required": ["name"]
                       }
                     },
                     "paths": {
@@ -281,9 +249,7 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         },
                                                         "status": {
                                                           "type": "object",
@@ -292,9 +258,7 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         },
                                                         "runtime": {
                                                           "type": "object",
@@ -303,9 +267,7 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         },
                                                         "architecture": {
                                                           "type": "object",
@@ -314,9 +276,7 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         }
                                                       },
                                                       "required": [
@@ -333,32 +293,19 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     }
                                   },
-                                  "required": [
-                                    "default"
-                                  ]
+                                  "required": ["default"]
                                 },
                                 "description": {
                                   "type": "string"
@@ -370,17 +317,10 @@
                                   }
                                 }
                               },
-                              "required": [
-                                "summary",
-                                "responses",
-                                "description",
-                                "tags"
-                              ]
+                              "required": ["summary", "responses", "description", "tags"]
                             }
                           },
-                          "required": [
-                            "get"
-                          ]
+                          "required": ["get"]
                         },
                         "/health": {
                           "type": "object",
@@ -423,15 +363,10 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         }
                                                       },
-                                                      "required": [
-                                                        "ok",
-                                                        "timestamp"
-                                                      ]
+                                                      "required": ["ok", "timestamp"]
                                                     },
                                                     "required": {
                                                       "type": "array",
@@ -440,32 +375,19 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     }
                                   },
-                                  "required": [
-                                    "default"
-                                  ]
+                                  "required": ["default"]
                                 },
                                 "description": {
                                   "type": "string"
@@ -477,17 +399,10 @@
                                   }
                                 }
                               },
-                              "required": [
-                                "summary",
-                                "responses",
-                                "description",
-                                "tags"
-                              ]
+                              "required": ["summary", "responses", "description", "tags"]
                             }
                           },
-                          "required": [
-                            "get"
-                          ]
+                          "required": ["get"]
                         },
                         "/discord/interactions": {
                           "type": "object",
@@ -535,15 +450,10 @@
                                                               }
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type",
-                                                            "enum"
-                                                          ]
+                                                          "required": ["type", "enum"]
                                                         }
                                                       },
-                                                      "required": [
-                                                        "error"
-                                                      ]
+                                                      "required": ["error"]
                                                     },
                                                     "required": {
                                                       "type": "array",
@@ -552,27 +462,16 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     },
                                     "401": {
                                       "type": "object",
@@ -602,14 +501,10 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         }
                                                       },
-                                                      "required": [
-                                                        "error"
-                                                      ]
+                                                      "required": ["error"]
                                                     },
                                                     "required": {
                                                       "type": "array",
@@ -618,27 +513,16 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     },
                                     "default": {
                                       "type": "object",
@@ -668,14 +552,10 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         }
                                                       },
-                                                      "required": [
-                                                        "type"
-                                                      ]
+                                                      "required": ["type"]
                                                     },
                                                     "required": {
                                                       "type": "array",
@@ -684,34 +564,19 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     }
                                   },
-                                  "required": [
-                                    "400",
-                                    "401",
-                                    "default"
-                                  ]
+                                  "required": ["400", "401", "default"]
                                 },
                                 "description": {
                                   "type": "string"
@@ -723,17 +588,10 @@
                                   }
                                 }
                               },
-                              "required": [
-                                "summary",
-                                "responses",
-                                "description",
-                                "tags"
-                              ]
+                              "required": ["summary", "responses", "description", "tags"]
                             }
                           },
-                          "required": [
-                            "post"
-                          ]
+                          "required": ["post"]
                         },
                         "/docs": {
                           "type": "object",
@@ -761,25 +619,16 @@
                                               "properties": {
                                                 "schema": {}
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     }
                                   },
-                                  "required": [
-                                    "default"
-                                  ]
+                                  "required": ["default"]
                                 },
                                 "description": {
                                   "type": "string"
@@ -791,17 +640,10 @@
                                   }
                                 }
                               },
-                              "required": [
-                                "summary",
-                                "responses",
-                                "description",
-                                "tags"
-                              ]
+                              "required": ["summary", "responses", "description", "tags"]
                             }
                           },
-                          "required": [
-                            "get"
-                          ]
+                          "required": ["get"]
                         },
                         "/docs/openapi": {
                           "type": "object",
@@ -843,9 +685,7 @@
                                                               "type": "string"
                                                             }
                                                           },
-                                                          "required": [
-                                                            "type"
-                                                          ]
+                                                          "required": ["type"]
                                                         },
                                                         "info": {
                                                           "type": "object",
@@ -875,10 +715,7 @@
                                                             },
                                                             "items": {}
                                                           },
-                                                          "required": [
-                                                            "type",
-                                                            "items"
-                                                          ]
+                                                          "required": ["type", "items"]
                                                         },
                                                         "tags": {
                                                           "type": "object",
@@ -888,10 +725,7 @@
                                                             },
                                                             "items": {}
                                                           },
-                                                          "required": [
-                                                            "type",
-                                                            "items"
-                                                          ]
+                                                          "required": ["type", "items"]
                                                         },
                                                         "paths": {
                                                           "type": "object",
@@ -929,32 +763,19 @@
                                                       }
                                                     }
                                                   },
-                                                  "required": [
-                                                    "type",
-                                                    "properties",
-                                                    "required"
-                                                  ]
+                                                  "required": ["type", "properties", "required"]
                                                 }
                                               },
-                                              "required": [
-                                                "schema"
-                                              ]
+                                              "required": ["schema"]
                                             }
                                           },
-                                          "required": [
-                                            "application/json"
-                                          ]
+                                          "required": ["application/json"]
                                         }
                                       },
-                                      "required": [
-                                        "description",
-                                        "content"
-                                      ]
+                                      "required": ["description", "content"]
                                     }
                                   },
-                                  "required": [
-                                    "default"
-                                  ]
+                                  "required": ["default"]
                                 },
                                 "description": {
                                   "type": "string"
@@ -966,17 +787,10 @@
                                   }
                                 }
                               },
-                              "required": [
-                                "summary",
-                                "responses",
-                                "description",
-                                "tags"
-                              ]
+                              "required": ["summary", "responses", "description", "tags"]
                             }
                           },
-                          "required": [
-                            "get"
-                          ]
+                          "required": ["get"]
                         }
                       },
                       "required": [
@@ -988,22 +802,14 @@
                       ]
                     }
                   },
-                  "required": [
-                    "openapi",
-                    "info",
-                    "servers",
-                    "tags",
-                    "paths"
-                  ]
+                  "required": ["openapi", "info", "servers", "tags", "paths"]
                 }
               }
             }
           }
         },
         "description": "Documento OpenAPI gerado automaticamente.",
-        "tags": [
-          "Documentation"
-        ]
+        "tags": ["Documentation"]
       }
     }
   }

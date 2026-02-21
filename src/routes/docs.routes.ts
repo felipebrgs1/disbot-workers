@@ -4,17 +4,17 @@ import openApiDocument from "../../openapi/openapi.json";
 import type { AppBindings } from "../types/bindings";
 
 const docsRoutes = new Hono<{ Bindings: AppBindings }>()
-	.get(
-		"/",
-		apiReference({
-			url: "/docs/openapi",
-		}),
-	)
-	.get("/openapi", (c) => {
-		return c.json(openApiDocument, 200, {
-			"cache-control": "no-store",
-		});
-	});
+  .get(
+    "/",
+    apiReference({
+      url: "/docs/openapi",
+    }),
+  )
+  .get("/openapi", (c) => {
+    return c.json(openApiDocument, 200, {
+      "cache-control": "no-store",
+    });
+  });
 
 export type AppType = typeof docsRoutes;
 

@@ -1,7 +1,0 @@
--- Migration number: 0001 	 2026-02-21T00:00:00.000Z
-CREATE TABLE IF NOT EXISTS discord_events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    interaction_id TEXT NOT NULL UNIQUE,
-    command_name TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);

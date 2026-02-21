@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/d1";
 
 export function createDb(db: D1Database) {
-	return drizzle(db);
+  return drizzle(db);
 }
