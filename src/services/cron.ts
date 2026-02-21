@@ -33,120 +33,111 @@ export async function syncDiscordMessages(env: AppBindings) {
       .where(eq(botState.key, "last_message_id"))
       .get();
 
-    let lastMessageId = stateRow?.value;
+    let currentLastMessageId = stateRow?.value;
+    let totalSyncedThisRun = 0;
+    const MAX_MESSAGES_PER_RUN = 1000; // Limite de segurança para 1 execução do Worker
+    let hasMore = true;
 
-    // 2. Montar a URL da API do Discord
-    let url = `https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages?limit=100`;
-    if (lastMessageId) {
-      url += `&after=${lastMessageId}`;
-    }
-
-    // 3. Fazer request para a API do Discord
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      console.error(
-        "Falha ao buscar mensagens do Discord:",
-        response.status,
-        await response.text(),
-      );
-      return;
-    }
-
-    const fetchedMessages: any[] = await response.json();
-
-    if (fetchedMessages.length === 0) {
-      console.log("Nenhuma mensagem nova no Discord.");
-      return;
-    }
-
-    // Ordenar mensagens do histórico mais antigo para mais novo, caso chegue invertido
-    fetchedMessages.sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
-
-    let newLastMessageId = lastMessageId;
-    const messagesToInsert = [];
-    const mentionsToProcess: any[] = [];
-
-    // 4. Salvar as mensagens novas
-    for (const msg of fetchedMessages) {
-      // Ignorar se a mensagem estiver vazia
-      if (!msg.content && msg.attachments?.length === 0) continue;
-
-      // Verificar se fomos mencionados (ignorando mensagens do próprio bot)
-      const isMentioned =
-        msg.author.id !== config.DISCORD_CLIENT_ID &&
-        (msg.mentions?.some((mention: any) => mention.id === config.DISCORD_CLIENT_ID) ||
-          msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
-          msg.content.includes(config.DISCORD_CLIENT_ID));
-
-      if (isMentioned) {
-        mentionsToProcess.push({
-          ...msg,
-          isAskCommand: false,
-        });
+    while (hasMore && totalSyncedThisRun < MAX_MESSAGES_PER_RUN) {
+      // 2. Montar a URL da API do Discord
+      let url = `https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages?limit=100`;
+      if (currentLastMessageId) {
+        url += `&after=${currentLastMessageId}`;
       }
 
-      messagesToInsert.push({
-        id: msg.id,
-        channelId: msg.channel_id,
-        authorId: msg.author.id,
-        authorUsername: msg.author.username,
-        content: msg.content,
-        timestamp: msg.timestamp,
+      // 3. Fazer request para a API do Discord
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
+          "Content-Type": "application/json",
+        },
       });
-      newLastMessageId = msg.id;
-    }
 
-    if (messagesToInsert.length > 0) {
-      // Inserir mensagens em batch
-      await db.insert(messages).values(messagesToInsert).onConflictDoNothing();
+      if (!response.ok) {
+        console.error(
+          "Falha ao buscar mensagens do Discord:",
+          response.status,
+          await response.text(),
+        );
+        break;
+      }
 
-      // Incorporar novo histórico longo prazo via RAG
-      await embedAndStoreMessages(env, config, messagesToInsert);
+      const fetchedMessages: any[] = await response.json();
 
-      // 5. Atualizar estado do bot
-      if (newLastMessageId) {
+      if (fetchedMessages.length === 0) {
+        if (totalSyncedThisRun === 0) {
+          console.log("Nenhuma mensagem nova no Discord.");
+        }
+        hasMore = false;
+        break;
+      }
+
+      // Ordenar mensagens do histórico mais antigo para mais novo
+      fetchedMessages.sort(
+        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+      );
+
+      const messagesToInsert = [];
+      const mentionsToProcess: any[] = [];
+
+      for (const msg of fetchedMessages) {
+        if (!msg.content && msg.attachments?.length === 0) continue;
+
+        const isMentioned =
+          msg.author.id !== config.DISCORD_CLIENT_ID &&
+          (msg.mentions?.some((mention: any) => mention.id === config.DISCORD_CLIENT_ID) ||
+            msg.content.includes(`<@${config.DISCORD_CLIENT_ID}>`) ||
+            msg.content.includes(config.DISCORD_CLIENT_ID));
+
+        if (isMentioned) {
+          mentionsToProcess.push({ ...msg, isAskCommand: false });
+        }
+
+        messagesToInsert.push({
+          id: msg.id,
+          channelId: msg.channel_id,
+          authorId: msg.author.id,
+          authorUsername: msg.author.username,
+          content: msg.content,
+          timestamp: msg.timestamp,
+        });
+        currentLastMessageId = msg.id;
+      }
+
+      if (messagesToInsert.length > 0) {
+        // Inserir mensagens em batch no BD
+        await db.insert(messages).values(messagesToInsert).onConflictDoNothing();
+
+        // Incorporar novo histórico no Vectorize (Mais rápido agora com Batching)
+        await embedAndStoreMessages(env, config, messagesToInsert);
+
+        // 5. Atualizar estado do bot no banco
         await db
           .insert(botState)
-          .values({
-            key: "last_message_id",
-            value: newLastMessageId,
-          })
+          .values({ key: "last_message_id", value: currentLastMessageId! })
           .onConflictDoUpdate({
             target: botState.key,
-            set: { value: newLastMessageId },
+            set: { value: currentLastMessageId! },
           });
-      }
 
-      console.log(`[Cron] ${messagesToInsert.length} novas mensagens sincronizadas!`);
+        totalSyncedThisRun += messagesToInsert.length;
+        console.log(`[Cron] Batch de ${messagesToInsert.length} mensagens sincronizado. Total: ${totalSyncedThisRun}`);
 
-      // 6. Integração Final com o Gemini
-      if (mentionsToProcess.length > 0) {
-        console.log(
-          `[Cron] Encontradas ${mentionsToProcess.length} menções! Gerando respostas com Inteligência Artificial...`,
-        );
+        // 6. Responder menções (Apenas na última mensagem para não spammar se houver várias acumuladas)
+        if (mentionsToProcess.length > 0) {
+          const mention = mentionsToProcess[mentionsToProcess.length - 1]; // Pega a mais recente do batch
+          console.log(`[Cron] Respondendo menção de ${mention.author.username}...`);
 
-        // Processa cada menção individualmente
-        for (const mention of mentionsToProcess) {
           const userPrompt = `Usuário [${mention.author.username}] diz: ${mention.content}`;
-
-          // Chamando nosso serviço de IA passando o prompt e histórico
           const aiResponse = await generateBotResponse(
             env,
             config,
             userPrompt,
             mention.isAskCommand,
+            mention.channel_id,
           );
 
-          // Envando resposta pro Discord e respondendo diretamente a mensagem
           await fetch(
             `https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`,
             {
@@ -157,16 +148,21 @@ export async function syncDiscordMessages(env: AppBindings) {
               },
               body: JSON.stringify({
                 content: `<@${mention.author.id}> ${aiResponse}`,
-                message_reference: {
-                  message_id: mention.id,
-                },
+                message_reference: { message_id: mention.id },
               }),
             },
           );
-
-          console.log(`[Cron] Resposta enviada para ${mention.author.username}!`);
         }
       }
+
+      // Se veio menos de 100, significa que alcançamos o "topo" do canal
+      if (fetchedMessages.length < 100) {
+        hasMore = false;
+      }
+    }
+
+    if (totalSyncedThisRun > 0) {
+      console.log(`[Cron] Sincronização finalizada: ${totalSyncedThisRun} mensagens processadas.`);
     }
   } finally {
     // 7. Liberar o Lock para as próximas rodadas independente de erro ou acerto

@@ -14,42 +14,37 @@ export async function embedAndStoreMessages(
   const ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY });
 
   try {
-    const vectorsToInsert = [];
-
-    for (const msg of messagesArray) {
-      if (!msg.content) continue;
+    const MAX_BATCH_GEMINI = 100;
+    for (let i = 0; i < messagesArray.length; i += MAX_BATCH_GEMINI) {
+      const batchMessages = messagesArray.slice(i, i + MAX_BATCH_GEMINI);
+      const contents = batchMessages.map(msg => `[Membro: ${msg.authorUsername}]: ${msg.content || ""}`);
 
       const response = await ai.models.embedContent({
-        model: "text-embedding-004",
-        contents: `[Membro: ${msg.authorUsername}]: ${msg.content}`,
+        model: "models/gemini-embedding-001",
+        contents,
       });
 
-      const values = response.embeddings?.[0]?.values;
-      if (values) {
-        vectorsToInsert.push({
-          id: msg.id,
-          values,
-          namespace: msg.channelId, // Namespace para isolar bancos por servidor/canal
-          metadata: {
-            authorUsername: msg.authorUsername,
-            content: msg.content,
-          },
-        });
-      }
-    }
+      const embeddings = response.embeddings;
+      if (embeddings && embeddings.length > 0) {
+        const vectorsToInsert = batchMessages.map((msg, index) => {
+          const values = embeddings[index]?.values;
+          if (!values) return null;
+          return {
+            id: msg.id,
+            values,
+            namespace: msg.channelId,
+            metadata: {
+              authorUsername: msg.authorUsername,
+              content: msg.content,
+            },
+          };
+        }).filter(v => v !== null) as any[];
 
-    if (vectorsToInsert.length > 0) {
-      // Divide inserção por limites (Upsert aceita muitos, mas é bom prevenir)
-      const MAX_BATCH = 100;
-      for (let i = 0; i < vectorsToInsert.length; i += MAX_BATCH) {
-        const batch = vectorsToInsert.slice(i, i + MAX_BATCH);
-
-        // ENV.VECTORIZE.upsert() garante que as mensagens nunca se multipliquem. 
-        // Como o ID da inserção é o ID oficial da mensagem do Discord (msg.id), 
-        // se a mensagem já existir lá, o Vectorize apenas atualiza e ignora a duplicação!
-        await env.VECTORIZE.upsert(batch);
+        if (vectorsToInsert.length > 0) {
+          await env.VECTORIZE.upsert(vectorsToInsert);
+          console.log(`[Vectorize] Salvas ${vectorsToInsert.length} memórias! (Chunk ${i / MAX_BATCH_GEMINI + 1})`);
+        }
       }
-      console.log(`[Vectorize] Salvos ${vectorsToInsert.length} memórias de longo prazo!`);
     }
   } catch (err) {
     console.error(`[Vectorize] Erro ao incorporar:`, err);
@@ -72,7 +67,7 @@ export async function generateBotResponse(
 
   try {
     const embeddingRes = await ai.models.embedContent({
-      model: "text-embedding-004",
+      model: "models/gemini-embedding-001",
       contents: userPrompt,
     });
 
@@ -132,7 +127,7 @@ Use esse contexto se fizer sentido. Agora responda a última mensagem (onde menc
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview", // Pode usar "gemini-2.5-flash" se preferir a estabilidade
+      model: "models/gemini-3-flash-preview", // Pode usar "gemini-2.5-flash" se preferir a estabilidade
       contents: [{ role: "user", parts: [{ text: promptText }] }],
       config: isAskCommand ? {} : {},
     });
