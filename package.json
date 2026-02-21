@@ -1,32 +1,26 @@
 {
-	"name": "d1-template",
-	"description": "Cloudflare's native serverless SQL database.",
-	"cloudflare": {
-		"label": "Worker + D1 Database",
-		"products": [
-			"Workers",
-			"D1"
-		],
-		"categories": [
-			"storage"
-		],
-		"docs_url": "https://developers.cloudflare.com/d1/",
-		"preview_icon_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/6c63cca8-354a-4951-45a0-d58769ac6f00/public",
-		"preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/aa6158f1-7711-4485-f134-a8c802c0a800/preview",
-		"publish": true
-	},
+	"name": "muddy-sunset-04c3",
+	"description": "Cloudflare Worker with Hono, Drizzle, Zod and Discord interactions.",
 	"devDependencies": {
 		"@types/node": "^25.3.0",
 		"typescript": "5.9.3",
 		"wrangler": "^4.67.0"
 	},
+	"dependencies": {
+		"discord-interactions": "latest",
+		"drizzle-orm": "latest",
+		"hono": "latest",
+		"zod": "latest"
+	},
+	"packageManager": "bun@1.3.8",
 	"private": true,
+	"type": "module",
 	"scripts": {
-		"cf-typegen": "wrangler types",
-		"check": "tsc && wrangler deploy --dry-run",
-		"deploy": "wrangler deploy",
-		"dev": "pnpm seedLocalD1 && wrangler dev",
-		"predeploy": "wrangler d1 migrations apply DB --remote",
-		"seedLocalD1": "wrangler d1 migrations apply DB --local"
+		"cf-typegen": "bunx wrangler types",
+		"check": "tsc --noEmit",
+		"deploy": "bunx wrangler deploy",
+		"dev": "bunx wrangler dev",
+		"db:migrate:local": "bunx wrangler d1 migrations apply DB --local",
+		"db:migrate:remote": "bunx wrangler d1 migrations apply DB --remote"
 	}
 }

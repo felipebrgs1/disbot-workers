@@ -11,8 +11,8 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_id": "151f7d9b-365f-41d7-83ed-0bf4eeef5086",
-			"database_name": "d1-template-database"
+			"database_name": "deploytest",
+			"database_id": "e711ecab-1124-4386-84bf-47002507f11a"
 		}
 	],
 	"observability": {
