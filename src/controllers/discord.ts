@@ -1,3 +1,4 @@
+import { ofetch } from "ofetch";
 import type { Context } from "hono";
 import { readRuntimeConfig } from "@config";
 import { parseDiscordInteraction, verifyDiscordRequest } from "@services/discord-interaction";
@@ -76,19 +77,15 @@ export async function handleDiscordInteraction(c: AppContext) {
               fullContent.length > 1950 ? fullContent.substring(0, 1950) + "..." : fullContent;
 
             // Enviar a resposta editando o webhook diferido original
-            const patchRes = await fetch(
+            const patchRes = await ofetch.raw(
               `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}/messages/@original`,
               {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: safeContent }),
+                body: { content: safeContent },
               },
             );
 
             console.log(`[Ask] EditOriginal Status: ${patchRes.status}`);
-            if (!patchRes.ok) {
-              console.error("[Ask] Response:", await patchRes.text());
-            }
           } catch (e) {
             console.error("Erro no processamento bg do comando ask", e);
           }

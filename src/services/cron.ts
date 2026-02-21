@@ -1,3 +1,4 @@
+import { ofetch } from "ofetch";
 import { eq } from "drizzle-orm";
 import { readRuntimeConfig } from "@config";
 import { createDb } from "@db/client";
@@ -46,24 +47,22 @@ export async function syncDiscordMessages(env: AppBindings) {
       }
 
       // 3. Fazer request para a API do Discord
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
+      let fetchedMessages: any[] = [];
+      try {
+        fetchedMessages = await ofetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
+          },
+        });
+      } catch (err: any) {
         console.error(
           "Falha ao buscar mensagens do Discord:",
-          response.status,
-          await response.text(),
+          err.status,
+          err.data || err.message,
         );
         break;
       }
-
-      const fetchedMessages: any[] = await response.json();
 
       if (fetchedMessages.length === 0) {
         if (totalSyncedThisRun === 0) {
@@ -138,18 +137,17 @@ export async function syncDiscordMessages(env: AppBindings) {
             mention.channel_id,
           );
 
-          await fetch(
+          await ofetch(
             `https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`,
             {
               method: "POST",
               headers: {
                 Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
-                "Content-Type": "application/json",
               },
-              body: JSON.stringify({
+              body: {
                 content: `<@${mention.author.id}> ${aiResponse}`,
                 message_reference: { message_id: mention.id },
-              }),
+              },
             },
           );
         }
