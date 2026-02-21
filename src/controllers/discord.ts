@@ -1,9 +1,7 @@
 import type { Context } from "hono";
 import { readRuntimeConfig } from "@config";
-import {
-  parseDiscordInteraction,
-  verifyDiscordRequest,
-} from "@services/discord-interaction";
+import { parseDiscordInteraction, verifyDiscordRequest } from "@services/discord-interaction";
+import { generateBotResponse } from "@services/gemini";
 import type { AppBindings } from "@appTypes/bindings";
 
 type AppContext = Context<{ Bindings: AppBindings }>;
@@ -58,21 +56,30 @@ export async function handleDiscordInteraction(c: AppContext) {
       c.executionCtx.waitUntil(
         (async () => {
           try {
-            const { generateBotResponse } = await import("../services/gemini");
+            console.log(`[Ask] Processando em background a pergunta: ${question}`);
             const aiResponse = await generateBotResponse(c.env, config, userPrompt, true);
+            console.log(`[Ask] Resposta Gerada (Length): ${aiResponse.length}`);
 
             // Enviar a resposta editando o webhook diferido original
-            await fetch(`https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interaction.token}/messages/@original`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                content: `<@${userId}> \n> **${question}**\n\n${aiResponse}`
-              })
-            });
+            const patchRes = await fetch(
+              `https://discord.com/api/v10/webhooks/${config.DISCORD_CLIENT_ID}/${interact.token}/messages/@original`,
+              {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  content: `<@${userId}> \n> **${question}**\n\n${aiResponse}`,
+                }),
+              },
+            );
+
+            console.log(`[Ask] EditOriginal Status: ${patchRes.status}`);
+            if (!patchRes.ok) {
+              console.error("[Ask] Response:", await patchRes.text());
+            }
           } catch (e) {
             console.error("Erro no processamento bg do comando ask", e);
           }
-        })()
+        })(),
       );
 
       // Responder 5 (AACK / Defer) imediatamente ao Discord

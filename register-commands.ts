@@ -3,13 +3,16 @@ import { readFileSync } from "fs";
 const envStr = readFileSync(".env", "utf8");
 const envFn = () => {
   let vars = {};
-  envStr.split("\n").forEach(line => {
+  envStr.split("\n").forEach((line) => {
     if (!line || line.startsWith("#")) return;
     const [k, ...v] = line.split("=");
-    vars[k.trim()] = v.join("=").trim().replace(/^['"]|['"]$/g, '');
+    vars[k.trim()] = v
+      .join("=")
+      .trim()
+      .replace(/^['"]|['"]$/g, "");
   });
   return vars;
-}
+};
 const env = envFn();
 
 async function registerCommands() {
