@@ -33,11 +33,7 @@ export async function syncDiscordMessages(env: AppBindings) {
   });
 
   if (!response.ok) {
-    console.error(
-      "Falha ao buscar mensagens do Discord:",
-      response.status,
-      await response.text()
-    );
+    console.error("Falha ao buscar mensagens do Discord:", response.status, await response.text());
     return;
   }
 
@@ -49,9 +45,7 @@ export async function syncDiscordMessages(env: AppBindings) {
   }
 
   // Ordenar mensagens do histórico mais antigo para mais novo, caso chegue invertido
-  fetchedMessages.sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  );
+  fetchedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   let newLastMessageId = lastMessageId;
   const messagesToInsert = [];
@@ -91,5 +85,24 @@ export async function syncDiscordMessages(env: AppBindings) {
     }
 
     console.log(`[Cron] ${messagesToInsert.length} novas mensagens sincronizadas!`);
+
+    // 6. Fase Básica (Teste): Se fomos mencionados nas novas mensagens, responder OI
+    const wasMentioned = messagesToInsert.some((m) =>
+      m.content.includes(`<@${config.DISCORD_CLIENT_ID}>`),
+    );
+
+    if (wasMentioned) {
+      console.log("[Cron] Bot mencionado! Enviando resposta de teste...");
+      await fetch(`https://discord.com/api/v10/channels/${config.DISCORD_CHANNEL_ID}/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bot ${config.DISCORD_BOT_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: "OI! Estou vivo e rodando no Cloudflare Workers! 🚀",
+        }),
+      });
+    }
   }
 }

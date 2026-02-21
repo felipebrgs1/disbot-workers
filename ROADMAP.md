@@ -3,6 +3,7 @@
 Aqui está o planejamento passo a passo das tarefas necessárias para implementar a arquitetura via Polling (Cron Trigger) e a Inteligência Artificial (Gemini), conforme combinamos.
 
 ## 1. Cloudflare Workers & Banco de Dados D1
+
 - [x] Inicializar projeto com Bun, Hono e Drizzle.
 - [x] Instalar o SDK do Google Gemini (`@google/genai`).
 - [x] Configurar linter e formatter (Oxlint e Oxcfmt).
@@ -13,6 +14,7 @@ Aqui está o planejamento passo a passo das tarefas necessárias para implementa
 - [x] Confirmar o mapeamento das variáveis de ambiente na validação do `config.ts`.
 
 ## 2. Ingestão de Histórico do Discord (Polling via Cron)
+
 Como optamos por evitar o timeout de 3 segundos do Gateway Serverless, o worker vai sincronizar as mensagens sozinho.
 
 - [x] **Configuração do Gatilho:** Adicionar o `[triggers]` no arquivo `wrangler.json` (ex: rodar a cada 5 minutos usando a sintaxe cron).
@@ -23,13 +25,15 @@ Como optamos por evitar o timeout de 3 segundos do Gateway Serverless, o worker 
 - [x] **Atualização de Estado:** Após finalizar, salvar o último ID lido na tabela `bot_state`.
 
 ## 3. Integração com IA (Google Gemini 2.5 Flash)
+
 - [ ] **Identificação de Menção:** Nas novas mensagens ingeridas pelo Cron Job, filtrar as mensagens cujo `content` contenha o ID do nosso Bot (menção `@Bot`).
 - [ ] **Resgate de Contexto:** Quando for marcado, consultar o D1 para puxar as últimas `X` (ex: 50 a 100) mensagens do canal para criar contexto.
 - [ ] **Formatação do Prompt:** Construir um system prompt consistente e enviar o array de mensagens como contexto usando a API do `@google/genai`.
 - [ ] **Envio para o Discord:** Enviar o resultado devolvido pela IA de volta ao canal do Discord original via o endpoint REST da API do Discord (`POST /channels/{channel.id}/messages`).
-- [ ] *(Opcional)* Lidar com erros de Rate Limit da IA/Discord ou respostas vazias.
+- [ ] _(Opcional)_ Lidar com erros de Rate Limit da IA/Discord ou respostas vazias.
 
 ## 4. Deploy e Validação
+
 - [ ] Rodar `bun run check` e linter / formatadores locais.
 - [ ] Executar o `bun run deploy` para atualizar os workers na nuvem Cloudflare.
 - [ ] Testar uma "marcação" real no grupo e ver o comportamento do Cron Job.
