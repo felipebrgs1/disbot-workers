@@ -7,15 +7,31 @@ import type { AppBindings } from "@appTypes/bindings";
 import { embedAndStoreMessages, generateBotResponse } from "./gemini";
 
 export async function syncDiscordMessages(env: AppBindings) {
-  // --- Mecanismo de Lock com KV ---
+  const db = createDb(env.DB);
+
+  // --- Mecanismo de Lock com D1 (Substituindo KV para economizar quota) ---
   // Impede que 2 instâncias do Cron rodem ao mesmo tempo e enviem respostas duplicadas
-  const lock = await env.discbot.get("sync_lock");
-  if (lock) {
-    console.log("[Cron] Já existe uma sincronização rodando. Abortando esta execução.");
+  const lockState = await db
+    .select()
+    .from(botState)
+    .where(eq(botState.key, "sync_lock"))
+    .get();
+
+  const now = Date.now();
+  if (lockState && parseInt(lockState.value) > now) {
+    console.log("[Cron] Já existe uma sincronização rodando (lock ativo no D1). Abortando.");
     return;
   }
-  // Cria o lock que expira em 60 segundos (tempo limite máximo de trava)
-  await env.discbot.put("sync_lock", "true", { expirationTtl: 60 });
+
+  // Cria o lock que expira em 2 minutos (tempo limite de segurança)
+  const expirationTime = now + 120000;
+  await db
+    .insert(botState)
+    .values({ key: "sync_lock", value: expirationTime.toString() })
+    .onConflictDoUpdate({
+      target: botState.key,
+      set: { value: expirationTime.toString() },
+    });
 
   try {
     const config = readRuntimeConfig(env as any);
@@ -24,8 +40,6 @@ export async function syncDiscordMessages(env: AppBindings) {
       console.log("[Cron] Variável DISCORD_CHANNEL_ID não configurada. Cron desabilitado.");
       return;
     }
-
-    const db = createDb(env.DB);
 
     // 1. Obter o último ID lido da tabela bot_state
     const stateRow = await db
@@ -164,6 +178,6 @@ export async function syncDiscordMessages(env: AppBindings) {
     }
   } finally {
     // 7. Liberar o Lock para as próximas rodadas independente de erro ou acerto
-    await env.discbot.delete("sync_lock");
+    await db.delete(botState).where(eq(botState.key, "sync_lock"));
   }
 }
